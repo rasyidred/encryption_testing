@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:web3dart/crypto.dart';
+import 'package:xor/xor.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -25,30 +27,50 @@ class MyApp extends StatelessWidget {
     return String.fromCharCodes(uint8list);
   }
 
-  void encrypt() {
-    const source = 'Anjing';
-    const secret = 'Top 😺 secret';
+  void encrypt(String message, String secret) {
+    // const source = 'Anjing';
+    // const secret = 'ini key';
 
     // final sourceHex = StringToHex.toHexString(source);
-    var sourceHex = convertStringToUint8List(source);
+    var messageHex = convertStringToUint8List(message);
+    // var testSource = bytesToHex(messageHex);
+
     var secretHex = convertStringToUint8List(secret);
-    print(
-      'Source: $source\n'
-      'SourceHex: $sourceHex\n'
-      'Secret: $secret'
-      'SecretHex: $secretHex\n',
-    );
-    final encrypted = XOR.encrypt(sourceHex.toString(), secretHex.toString(),
-        urlEncode: true);
-    final decrypted = XOR.decrypt(encrypted, secret, urlDecode: true);
+    // secretHex = keccak256(secretHex);
 
-    // final encrypted = convertUint8ListToString(sourceHex);
-    // final decrypted = convertUint8ListToString(secretHex);
+    // var testSecret = bytesToHex(secretHex);
+
+    var encrypted = xor(messageHex, secretHex);
+    var resultE = bytesToHex(encrypted);
+
+    // var decrypted = xor(encrypted, secretHex);
+    // var resultD = bytesToHex(decrypted);
+
+    print('Encryption Result: $resultE\n'
+        // 'Encrypted: $encrypted\n'
+        // 'Key: $secretHex\n'
+        // 'Decrypted: $decrypted\n'
+        // 'ResultD: ${convertUint8ListToString(decrypted)}\n'
+        // 'Identical: ${identical(source, decrypted)}',
+        );
+  }
+
+  void decryptHash1(String encrypted, String key) {
+    Uint8List encryptedHex = hexToBytes(encrypted);
+
+    // var keyHex = convertStringToUint8List(key);
+    // var keyHexx = bytesToHex(keyHex);
+    var keyHex = hexToBytes(key);
+
+    Uint8List resultDecrypt = xor(encryptedHex, keyHex);
+
+    String resultDecryptString = bytesToHex(resultDecrypt);
 
     print(
-      'Encrypted: $encrypted\n'
-      'Decrypted: $decrypted\n'
-      'Identical: ${identical(source, decrypted)}',
+      // 'Encrypted Hex: $encryptedHex\n'
+      'Result Hasil Decrypt: $resultDecryptString\n'
+      // 'KeyHex Decrypt: $keyHex',
+      ,
     );
   }
 
@@ -64,7 +86,10 @@ class MyApp extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                encrypt();
+                encrypt('Anjing', 'ini key');
+                decryptHash1(
+                    'b52381fcf8bab37c667cbb8a288cabafcfdacd75dbc17e0ee1f8990cc9ce4bcf',
+                    '696e69206b6579');
               },
               child: Text('Pesan'),
             )
